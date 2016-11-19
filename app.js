@@ -26,6 +26,7 @@ var govTrack = require('govtrack-node');
 var _ = require('lodash-node');
 var Q = require('q');
 var https = require('https');
+var twilio = require('twilio');
 
 
 // all environments
@@ -141,16 +142,32 @@ app.get('/api/reps', function(req, res) {
   }).end();
 });
 
-//govTrack.findPerson({ gender: 'male', lastname: 'smith' }, function(err, repData) {
-//  //govTrack.findPerson({lastname: dataItem.last_name}, function(err, repData) {
-//  if (!err) {
-//    dataItem.description = repData.description;
-//    dataItem.address = repData.extra.address;
-//    return resolve(dataItem);
-//  } else {
-//    return resolve(dataItem);
-//  }
-//});
+app.get('/api/call', function(req, res) {
+  var accountSid = 'AC528f484464e5ad9262c0a98a659b76f8'; // Your Account SID from www.twilio.com/console
+  var tok = 'b2de75b4702b74e6beb323b696228aac';   // Your Auth Token from www.twilio.com/console
+
+  var client = new twilio.RestClient(accountSid, tok);
+
+  //var accountSid = 'AC528f484464e5ad9262c0a98a659b76f8';
+  //var authToken = "your_auth_token";
+  var client = require('twilio')(accountSid, tok);
+
+  client.calls.create({
+    url: "https://call-matters.mybluemix.net/twilio",
+    to: "+15713660668",
+    from: "+15714464303"
+  }, function(err, call) {
+    //process.stdout.write(call.sid);
+    res.send('called');
+  });
+});
+
+app.get('/twilio', function(req, res) {
+  res.send('<?xml version="1.0" encoding="UTF-8"?>' +
+  '<Response>' +
+  '<Say>Thanks for calling!</Say>' +
+  '</Response>');
+});
 
 app.get('/api/news', function(req, res) {
   var myApiKey = '2f54d6003ad201e8d8e204f9c5a3349e7d15fb01';
