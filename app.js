@@ -87,7 +87,9 @@ app.get('/api/reps', function(req, res) {
       //the whole response has been recieved, so we just print it out here
       response.on('end', function() {
         res.setHeader('Content-Type', 'application/json');
-        res.send(str);
+        var data = JSON.parse(str);
+
+        res.send(data.results);
       });
     }).end();
   }
