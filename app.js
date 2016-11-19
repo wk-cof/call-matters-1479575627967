@@ -141,6 +141,10 @@ var saveDocument = function(id, name, value, response) {
 	
 }
 
+ap.get('/api/reps', function(req, res) {
+	res.send('hello world');
+})
+
 app.get('/api/favorites/attach', function(request, response) {
     var doc = request.query.id;
     var key = request.query.key;
