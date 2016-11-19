@@ -145,28 +145,31 @@ app.get('/api/reps', function(req, res) {
 app.get('/api/call', function(req, res) {
   var accountSid = 'AC528f484464e5ad9262c0a98a659b76f8'; // Your Account SID from www.twilio.com/console
   var tok = 'b2de75b4702b74e6beb323b696228aac';   // Your Auth Token from www.twilio.com/console
+  var numberToCall = req.query.number;
+  var message = req.query.message;
 
-  var client = new twilio.RestClient(accountSid, tok);
-
-  //var accountSid = 'AC528f484464e5ad9262c0a98a659b76f8';
-  //var authToken = "your_auth_token";
   var client = require('twilio')(accountSid, tok);
 
   client.calls.create({
-    url: "https://call-matters.mybluemix.net/twilio",
+    url: "http://call-matters.mybluemix.net/twilio?message=" + message,
     to: "+15713660668",
     from: "+15714464303"
   }, function(err, call) {
-    //process.stdout.write(call.sid);
+    process.stdout.write(call.sid);
     res.send('called');
   });
 });
 
+
 app.get('/twilio', function(req, res) {
-  res.send('<?xml version="1.0" encoding="UTF-8"?>' +
-  '<Response>' +
-  '<Say>Thanks for calling!</Say>' +
-  '</Response>');
+  // Use the Twilio Node.js SDK to build an XML response
+  var message = req.query.message;
+  var twiml = new twilio.TwimlResponse();
+  twiml.say(message, { voice: 'alice' });
+
+  // Render the response as XML in reply to the webhook request
+  res.type('text/xml');
+  res.send(twiml.toString());
 });
 
 app.get('/api/news', function(req, res) {
