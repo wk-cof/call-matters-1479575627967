@@ -178,6 +178,9 @@ app.get('/api/news', function(req, res) {
     response.on('end', function() {
       res.setHeader('Content-Type', 'application/json');
       var data = JSON.parse(str);
+      data = _.map(data.result.docs, function(newsItem) {
+        return newsItem.source.enriched.url;
+      });
       res.send(data);
     });
   }).end();
