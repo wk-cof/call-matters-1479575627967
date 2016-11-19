@@ -174,6 +174,7 @@ app.get('/twilio.xml', function(req, res) {
 
 app.get('/api/news', function(req, res) {
   var myApiKey = '2f54d6003ad201e8d8e204f9c5a3349e7d15fb01';
+  myApiKey = 'df72ca03c19dcd9c5f6fbd6d2f05f2b0d7648b7f';
   var query = encodeURI(req.query.name);
   if (!query) {
     return sendError(res, 'You need to specify "name" query parameter');
