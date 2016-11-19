@@ -151,7 +151,7 @@ app.get('/api/call', function(req, res) {
   var client = require('twilio')(accountSid, tok);
 
   client.calls.create({
-    url: "call-matters.mybluemix.net/twilio.xml",
+    url: "http://call-matters.mybluemix.net/twilio.xml",
     to: "+15713660668",
     from: "+15714464303"
   }, function(err, call) {
