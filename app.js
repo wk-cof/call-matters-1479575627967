@@ -58,6 +58,14 @@ var getDescription = function(dataItem) {
   return latestRole.description;
 };
 
+var getAddress = function(dataItem) {
+  var latestRole = _.filter(dataItem.roles, {current: true});
+  if (_.isArray(latestRole)) {
+    return latestRole[0].extra.address;
+  }
+  return latestRole.extra.address;
+};
+
 app.get('/', routes.index);
 
 app.get('/api/reps/:repid', function(req, res) {
@@ -113,6 +121,7 @@ app.get('/api/reps', function(req, res) {
               var parsedData = JSON.parse(repData);
               dataItem.full_name = parsedData.name;
               dataItem.description = getDescription(parsedData);
+              dataItem.address = getAddress(parsedData);
               resolve(dataItem);
             });
             otherResp.on('error', function(err) {
