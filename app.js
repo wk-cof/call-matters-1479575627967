@@ -69,43 +69,33 @@ app.get('/api/reps/:repid', function(req, res) {
 });
 
 app.get('/api/reps', function(req, res) {
+  var zip = req.query.zip;
+  var options = {
+    host: 'congress.api.sunlightfoundation.com',
+    path: '/legislators'
+  };
+
   if (req.query.zip) {
-    var zip = req.query.zip;
-    var options = {
-      host: 'congress.api.sunlightfoundation.com',
-      path: '/legislators/locate?zip=' + zip
-    };
-
-    http.request(options, function(response) {
-      var str = '';
-
-      //another chunk of data has been recieved, so append it to `str`
-      response.on('data', function(chunk) {
-        str += chunk;
-      });
-
-      //the whole response has been recieved, so we just print it out here
-      response.on('end', function() {
-        res.setHeader('Content-Type', 'application/json');
-        var data = JSON.parse(str);
-
-        res.send(data.results);
-      });
-    }).end();
+    options.path += '/locate?zip=' + req.query.zip
+  } else if (req.query.longitude && req.query.latitude) {
+    options.path += '/locate?longitude=' + req.query.longitude + '&latitude=' + req.query.latitude
   }
-  else {
-    govTrack.findRole({current: true}, function(err, repList) {
-      if (!err) {
-        res.statusCode = 200;
-        res.setHeader('Content-Type', 'application/json');
-        res.send(repList);
-      }
-      else {
-        sendError(res);
-      }
+
+  http.request(options, function(response) {
+    var str = '';
+
+    //another chunk of data has been recieved, so append it to `str`
+    response.on('data', function(chunk) {
+      str += chunk;
     });
-  }
 
+    //the whole response has been recieved, so we just print it out here
+    response.on('end', function() {
+      res.setHeader('Content-Type', 'application/json');
+      var data = JSON.parse(str);
+      res.send(data.results);
+    });
+  }).end();
 });
 
 /*
