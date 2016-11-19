@@ -22,6 +22,7 @@ var logger = require('morgan');
 var errorHandler = require('errorhandler');
 var multipart = require('connect-multiparty')
 var multipartMiddleware = multipart();
+var govTrack = require('govtrack-node');
 
 // all environments
 app.set('port', process.env.PORT || 3000);
@@ -120,6 +121,32 @@ function createResponseData(id, name, value, attachments) {
 }
 
 
+app.get('/api/reps', function(req, res) {
+	govTrack.findRole({current: true}, function(err, repList) {
+		if (!err) {
+			res.statusCode = 200;
+			res.setHeader('Content-Type', 'application/json');
+			res.send(repList);
+		}
+		else {
+			sendError(res);
+		}
+	});
+});
+
+app.get('/api/reps/:repid', function(req, res) {
+	govTrack.findPerson({gender: 'male', id: req.param('repid')}, function(err, repData) {
+		if (!err) {
+			res.statusCode = 200;
+			res.setHeader('Content-Type', 'application/json');
+			res.send(repData);
+		} else {
+			sendError(res);
+		}
+	});
+});
+
+/*
 var saveDocument = function(id, name, value, response) {
 	
 	if(id === undefined) {
@@ -140,10 +167,6 @@ var saveDocument = function(id, name, value, response) {
 	});
 	
 }
-
-ap.get('/api/reps', function(req, res) {
-	res.send('hello world');
-})
 
 app.get('/api/favorites/attach', function(request, response) {
     var doc = request.query.id;
@@ -419,7 +442,7 @@ app.get('/api/favorites', function(request, response) {
 	});
 
 });
-
+*/
 
 http.createServer(app).listen(app.get('port'), '0.0.0.0', function() {
 	console.log('Express server listening on port ' + app.get('port'));
