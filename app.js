@@ -151,19 +151,19 @@ app.get('/api/call', function(req, res) {
   var client = require('twilio')(accountSid, tok);
 
   client.calls.create({
-    url: "http://call-matters.mybluemix.net/twilio?message=" + message,
+    url: "call-matters.mybluemix.net/twilio.xml",
     to: "+15713660668",
     from: "+15714464303"
   }, function(err, call) {
-    process.stdout.write(call.sid);
     res.send('called');
   });
 });
 
 
-app.get('/twilio', function(req, res) {
+app.get('/twilio.xml', function(req, res) {
   // Use the Twilio Node.js SDK to build an XML response
   var message = req.query.message;
+  message = "Dear representative, please do something!";
   var twiml = new twilio.TwimlResponse();
   twiml.say(message, { voice: 'alice' });
 
@@ -184,7 +184,7 @@ app.get('/api/news', function(req, res) {
       myApiKey +
       '&return=enriched.url.title,enriched.url.url&start=1474329600&end=1479596400&q.enriched.url.entities.entity=|text=' +
       query +
-      ',type=person|&q.enriched.url.taxonomy.taxonomy_.label=law,%20govt%20and%20politics&count=25&outputMode=json'
+      ',type=person|&q.enriched.url.taxonomy.taxonomy_.label=law,%20govt%20and%20politics&count=2&outputMode=json'
   };
 
   http.request(options, function(response) {
