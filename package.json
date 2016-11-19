@@ -15,7 +15,8 @@
     "govtrack-node": "0.2.0",
     "lodash-node": "3.10.2",
     "method-override": "2.3.x",
-    "morgan": "1.6.x"
+    "morgan": "1.6.x",
+    "q": "1.4.1"
   },
   "repository": {},
   "engines": {

@@ -24,6 +24,9 @@ var multipart = require('connect-multiparty')
 var multipartMiddleware = multipart();
 var govTrack = require('govtrack-node');
 var _ = require('lodash-node');
+var Q = require('q');
+var https = require('https');
+
 
 // all environments
 app.set('port', process.env.PORT || 3000);
@@ -47,10 +50,18 @@ var sendError = function(res, err) {
   res.send('Bad request. ' + JSON.stringify(err));
 };
 
+var getDescription = function(dataItem) {
+  var latestRole = _.filter(dataItem.roles, {current: true});
+  if (_.isArray(latestRole)) {
+    return latestRole[0].description;
+  }
+  return latestRole.description;
+};
+
 app.get('/', routes.index);
 
 app.get('/api/reps/:repid', function(req, res) {
-  govTrack.findPerson({gender: 'male', id: req.param('repid')}, function(err, repData) {
+  govTrack.findPerson({bioguideid: req.param('repid')}, function(err, repData) {
     if (!err) {
       res.statusCode = 200;
       res.setHeader('Content-Type', 'application/json');
@@ -86,15 +97,50 @@ app.get('/api/reps', function(req, res) {
     response.on('end', function() {
       res.setHeader('Content-Type', 'application/json');
       var data = JSON.parse(str);
-      data = _.map(data.results, function(dataItem) {
-        var middleName = dataItem.middle_name ? dataItem.middle_name + ' ' : '';
-        dataItem.full_name = dataItem.first_name + ' ' + middleName + dataItem.last_name;
-        return dataItem;
+      dataPromises = _.map(data.results, function(dataItem) {
+        //var middleName = dataItem.middle_name ? dataItem.middle_name + ' ' : '';
+        return Q.Promise(function(resolve, reject, notify) {
+          var intOptions = {
+            host: 'www.govtrack.us',
+            path: '/api/v2/person/' + dataItem.govtrack_id
+          };
+          https.get('https://www.govtrack.us/api/v2/person/' + dataItem.govtrack_id, function(otherResp) {
+            var repData = '';
+            otherResp.on('data', function(chunk) {
+              repData += chunk;
+            });
+            otherResp.on('end', function() {
+              var parsedData = JSON.parse(repData);
+              dataItem.full_name = parsedData.name;
+              dataItem.description = getDescription(parsedData);
+              resolve(dataItem);
+            });
+            otherResp.on('error', function(err) {
+              reject(err);
+            })
+          }).end();
+        });
+        //dataItem.full_name = dataItem.first_name + ' ' + middleName + dataItem.last_name;
+        //return dataItem;
       });
-      res.send(data);
+
+      Q.all(dataPromises).then(function (results) {
+        res.send(results);
+      });
     });
   }).end();
 });
+
+//govTrack.findPerson({ gender: 'male', lastname: 'smith' }, function(err, repData) {
+//  //govTrack.findPerson({lastname: dataItem.last_name}, function(err, repData) {
+//  if (!err) {
+//    dataItem.description = repData.description;
+//    dataItem.address = repData.extra.address;
+//    return resolve(dataItem);
+//  } else {
+//    return resolve(dataItem);
+//  }
+//});
 
 app.get('/api/news', function(req, res) {
   var myApiKey = '2f54d6003ad201e8d8e204f9c5a3349e7d15fb01';
