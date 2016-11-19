@@ -119,7 +119,8 @@ app.get('/api/reps', function(req, res) {
             });
             otherResp.on('end', function() {
               var parsedData = JSON.parse(repData);
-              dataItem.full_name = parsedData.name;
+              var middleName = dataItem.middle_name ? dataItem.middle_name + ' ' : '';
+              dataItem.full_name = dataItem.first_name + ' ' + middleName + dataItem.last_name;
               dataItem.description = getDescription(parsedData);
               dataItem.address = getAddress(parsedData);
               resolve(dataItem);
