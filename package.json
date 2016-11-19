@@ -13,6 +13,7 @@
     "errorhandler": "1.4.x",
     "express": "4.13.x",
     "govtrack-node": "0.2.0",
+    "lodash-node": "3.10.2",
     "method-override": "2.3.x",
     "morgan": "1.6.x"
   },

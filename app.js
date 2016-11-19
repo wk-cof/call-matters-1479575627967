@@ -23,6 +23,7 @@ var errorHandler = require('errorhandler');
 var multipart = require('connect-multiparty')
 var multipartMiddleware = multipart();
 var govTrack = require('govtrack-node');
+var _ = require('lodash-node');
 
 // all environments
 app.set('port', process.env.PORT || 3000);
@@ -93,7 +94,12 @@ app.get('/api/reps', function(req, res) {
     response.on('end', function() {
       res.setHeader('Content-Type', 'application/json');
       var data = JSON.parse(str);
-      res.send(data.results);
+      data = _.map(data.results, function(dataItem) {
+        var middleName = dataItem.middle_name ? dataItem.middle_name + ' ' : '';
+        dataItem.full_name = dataItem.first_name + ' ' + middleName + dataItem.last_name;
+        return dataItem;
+      });
+      res.send(data);
     });
   }).end();
 });
