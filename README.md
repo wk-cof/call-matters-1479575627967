@@ -1,5 +1,5 @@
 # Call Matters
-## Backend for [AT&T MObile App Hackathon](https://www.eventbrite.com/e/att-mobile-app-hackathon-nyc-tickets-27363474890#)
+## Backend for [AT&T Mobile App Hackathon 2016](https://www.eventbrite.com/e/att-mobile-app-hackathon-nyc-tickets-27363474890#)
 
 Collects data from various political information aggregators, massages the data and outputs JSON in mobile-friendly JSON format.
 
